@@ -71,6 +71,18 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
+
   const handleLogout = () => {
     localStorage.removeItem("userToken");
     localStorage.removeItem("isAdmin");
@@ -85,8 +97,8 @@ const Navbar = () => {
       <div
         className={`relative transition-all duration-500 ${
           scrolled
-            ? "bg-white/80 backdrop-blur-xl shadow-xl shadow-black/5 border-b border-gray-200/70"
-            : "bg-white/60 backdrop-blur-lg border-b border-gray-100/50"
+            ? "bg-white backdrop-blur-xl shadow-xl shadow-black/5 border-b border-gray-200/70"
+            : "bg-transparent"
         }`}
       >
         {/* Admin Banner */}
@@ -337,11 +349,12 @@ const Navbar = () => {
 
         <div
           ref={mobileMenuRef}
-          className={`absolute top-0 bottom-0 left-0 w-4/5 max-w-sm bg-white/95 backdrop-blur-2xl shadow-2xl transform transition-transform duration-400 ease-out ${
+          className={`absolute top-0 bottom-0 left-0 w-4/5 max-w-sm bg-white/95 backdrop-blur-2xl shadow-2xl transform transition-transform duration-400 ease-out flex flex-col ${
             isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
-          <div className="flex items-center justify-between p-6 border-b border-gray-100">
+          {/* Header - Fixed */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-100 shrink-0">
             <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
               <img className="h-9" src={assets.logo} alt="Lecruiter" />
             </Link>
@@ -353,144 +366,153 @@ const Navbar = () => {
             </button>
           </div>
 
-          <div className="p-6 flex flex-col h-[calc(100%-theme(spacing.20))]">
-            <ul className="space-y-2 flex-1">
-              {menu.map((item, i) => (
-                <li key={item.path}>
-                  <NavLink
-                    to={item.path}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={({ isActive }) =>
-                      `flex items-center px-5 py-4 rounded-xl text-base font-medium transition-all ${
-                        isActive
-                          ? "bg-gray-100 text-gray-900"
-                          : "text-gray-700 hover:bg-gray-50"
-                      }`
-                    }
-                  >
-                    {item.name}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto overscroll-contain">
+            <div className="p-6 pb-8 space-y-6">
+              {/* Navigation Menu */}
+              <ul className="space-y-2">
+                {menu.map((item, i) => (
+                  <li key={item.path}>
+                    <NavLink
+                      to={item.path}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={({ isActive }) =>
+                        `flex items-center px-5 py-4 rounded-xl text-base font-medium transition-all ${
+                          isActive
+                            ? "bg-gray-100 text-gray-900"
+                            : "text-gray-700 hover:bg-gray-50"
+                        }`
+                      }
+                    >
+                      {item.name}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
 
-            {userDataLoading ? (
-              <LoaderCircle className="w-8 h-8 animate-spin text-gray-600 mx-auto my-10" />
-            ) : isLogin ? (
-              <div className="pt-6 border-t border-gray-100 space-y-4">
-                <div className={`flex items-center gap-4 px-4 py-4 rounded-xl ${
-                  isAdmin ? "bg-gradient-to-br from-blue-50 to-purple-50" : "bg-gray-50/70"
-                }`}>
-                  <div className="relative">
-                    <img
-                      className="w-14 h-14 rounded-full object-cover ring-2 ring-gray-200"
-                      src={userData?.image || assets.avatarPlaceholder}
-                      alt="Profile"
-                      onError={(e) => (e.currentTarget.src = assets.avatarPlaceholder)}
-                    />
-                    {isAdmin && (
-                      <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-600 rounded-full border-2 border-white shadow flex items-center justify-center">
-                        <Shield className="h-3 w-3 text-white" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="font-semibold text-gray-900">{userData?.name}</p>
+              {/* User Section */}
+              {userDataLoading ? (
+                <div className="flex justify-center py-10">
+                  <LoaderCircle className="w-8 h-8 animate-spin text-gray-600" />
+                </div>
+              ) : isLogin ? (
+                <div className="pt-6 border-t border-gray-100 space-y-4">
+                  {/* User Info Card */}
+                  <div className={`flex items-center gap-4 px-4 py-4 rounded-xl ${
+                    isAdmin ? "bg-gradient-to-br from-blue-50 to-purple-50" : "bg-gray-50/70"
+                  }`}>
+                    <div className="relative shrink-0">
+                      <img
+                        className="w-14 h-14 rounded-full object-cover ring-2 ring-gray-200"
+                        src={userData?.image || assets.avatarPlaceholder}
+                        alt="Profile"
+                        onError={(e) => (e.currentTarget.src = assets.avatarPlaceholder)}
+                      />
                       {isAdmin && (
-                        <span className="px-1.5 py-0.5 bg-blue-600 text-white text-[9px] font-bold rounded">
-                          ADMIN
-                        </span>
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-600 rounded-full border-2 border-white shadow flex items-center justify-center">
+                          <Shield className="h-3 w-3 text-white" />
+                        </div>
                       )}
                     </div>
-                    <p className="text-sm text-gray-500 truncate">{userData?.email}</p>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-semibold text-gray-900 truncate">{userData?.name}</p>
+                        {isAdmin && (
+                          <span className="px-1.5 py-0.5 bg-blue-600 text-white text-[9px] font-bold rounded shrink-0">
+                            ADMIN
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-500 truncate">{userData?.email}</p>
+                    </div>
+                  </div>
+
+                  {/* Profile Actions */}
+                  <div className="space-y-2">
+                    {isAdmin ? (
+                      <>
+                        <Link
+                          to="/dashboard"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-3 px-5 py-4 rounded-xl text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors font-medium"
+                        >
+                          <LayoutDashboard size={20} className="shrink-0" />
+                          <span>Admin Dashboard</span>
+                        </Link>
+
+                        <Link
+                          to="/admin/users"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-3 px-5 py-4 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                        >
+                          <Users size={20} className="shrink-0" />
+                          <span>Manage Users</span>
+                        </Link>
+
+                        <Link
+                          to="/admin/reports"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-3 px-5 py-4 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                        >
+                          <FileText size={20} className="shrink-0" />
+                          <span>Reports</span>
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        <Link
+                          to="/profile"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-3 px-5 py-4 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                        >
+                          <User size={20} className="shrink-0" />
+                          <span>Profile</span>
+                        </Link>
+
+                        <Link
+                          to="/applications"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-3 px-5 py-4 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                        >
+                          <Briefcase size={20} className="shrink-0" />
+                          <span>Applied Jobs</span>
+                        </Link>
+                      </>
+                    )}
+
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-5 py-4 rounded-xl text-red-600 hover:bg-red-50 transition-colors font-medium"
+                    >
+                      <LogOut size={20} className="shrink-0" />
+                      <span>Logout</span>
+                    </button>
                   </div>
                 </div>
-
-                <div className="space-y-2">
-                  {isAdmin ? (
-                    <>
-                      <Link
-                        to="/dashboard"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-5 py-4 rounded-xl text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors font-medium"
-                      >
-                        <LayoutDashboard size={20} />
-                        Admin Dashboard
-                      </Link>
-
-                      <Link
-                        to="/admin/users"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-5 py-4 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors font-medium"
-                      >
-                        <Users size={20} />
-                        Manage Users
-                      </Link>
-
-                      <Link
-                        to="/admin/reports"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-5 py-4 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors font-medium"
-                      >
-                        <FileText size={20} />
-                        Reports
-                      </Link>
-                    </>
-                  ) : (
-                    <>
-                      <Link
-                        to="/profile"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-5 py-4 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors font-medium"
-                      >
-                        <User size={20} />
-                        Profile
-                      </Link>
-
-                      <Link
-                        to="/applications"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-5 py-4 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors font-medium"
-                      >
-                        <Briefcase size={20} />
-                        Applied Jobs
-                      </Link>
-                    </>
-                  )}
-
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-5 py-4 rounded-xl text-red-600 hover:bg-red-50 transition-colors font-medium"
+              ) : (
+                <div className="pt-6 border-t border-gray-100 space-y-4">
+                  <Link
+                    to="/recruiter-login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block text-center py-4 rounded-xl font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-200 transition-colors"
                   >
-                    <LogOut size={20} />
-                    Logout
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="pt-8 space-y-4">
-                <Link
-                  to="/recruiter-login"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block text-center py-4 rounded-xl font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-200 transition-colors"
-                >
-                  Recruiter Login
-                </Link>
+                    Recruiter Login
+                  </Link>
 
-                <Link
-                  to="/candidate-login"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block text-center py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-gray-900 to-black hover:from-black hover:to-gray-900 shadow-lg transition-all flex items-center justify-center gap-2"
-                >
-                  Candidate Login
-                  <Sparkles size={16} className="animate-pulse" />
-                </Link>
-              </div>
-            )}
+                  <Link
+                    to="/candidate-login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 text-center py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-gray-900 to-black hover:from-black hover:to-gray-900 shadow-lg transition-all"
+                  >
+                    <span>Candidate Login</span>
+                    <Sparkles size={16} className="animate-pulse" />
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

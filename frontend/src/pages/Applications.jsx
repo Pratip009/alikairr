@@ -68,7 +68,7 @@ const Applications = () => {
   return (
     <>
      
-      <section>
+      <section className="px-5 md:px-15">
         {/* Resume Section */}
         <div className="mb-10">
           <h1 className="text-lg font-medium mb-3">Your Resume</h1>

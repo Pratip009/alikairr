@@ -22,7 +22,7 @@ import data_scince from "./intelligence.png";
 import left_arrow_icon from "./left_arrow_icon.svg";
 import location_icon from "./location_icon.svg";
 import lock_icon from "./lock_icon.svg";
-import logo from "./logo.svg";
+import logo from "./alli.png";
 import microsoft_logo from "./microsoft_logo.svg";
 import money_icon from "./money_icon.svg";
 import person_icon from "./person_icon.svg";
@@ -203,14 +203,25 @@ export const JobCategories = [
 ];
 
 export const JobLocations = [
-  "Dhaka",
-  "Chattogram",
-  "Khulna",
-  "Rajshahi",
-  "Barishal",
-  "Sylhet",
-  "Rangpur",
-  "Mymensingh",
+  "New York, NY",
+  "Los Angeles, CA",
+  "Chicago, IL",
+  "Houston, TX",
+  "Phoenix, AZ",
+  "Philadelphia, PA",
+  "San Antonio, TX",
+  "San Diego, CA",
+  "Dallas, TX",
+  "San Jose, CA",
+  "San Francisco, CA",
+  "Seattle, WA",
+  "Boston, MA",
+  "Atlanta, GA",
+  "Miami, FL",
+  "Orlando, FL",
+  "Tampa, FL",
+  "Denver, CO",
+  "Austin, TX",
   "Remote",
 ];
 

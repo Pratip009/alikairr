@@ -45,7 +45,7 @@ const AddJob = () => {
         setTitle("");
         setDescription("");
         setCategory("Programming");
-        setLocation("Dhaka");
+        setLocation("New York, NY");
         setLevel("Intermediate");
         setSalary(null);
 
@@ -146,13 +146,25 @@ const AddJob = () => {
               onChange={(e) => setLocation(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="Dhaka">Dhaka</option>
-              <option value="Rangpur">Rangpur</option>
-              <option value="Barishal">Barishal</option>
-              <option value="Khulna">Khulna</option>
-              <option value="Mymensingh">Mymensingh</option>
-              <option value="Rajshahi">Rajshahi</option>
-              <option value="Sylhet">Sylhet</option>
+              <option value="New York, NY">New York, NY</option>
+              <option value="Los Angeles, CA">Los Angeles, CA</option>
+              <option value="Chicago, IL">Chicago, IL</option>
+              <option value="Houston, TX">Houston, TX</option>
+              <option value="Phoenix, AZ">Phoenix, AZ</option>
+              <option value="Philadelphia, PA">Philadelphia, PA</option>
+              <option value="San Antonio, TX">San Antonio, TX</option>
+              <option value="San Diego, CA">San Diego, CA</option>
+              <option value="Dallas, TX">Dallas, TX</option>
+              <option value="San Jose, CA">San Jose, CA</option>
+              <option value="San Francisco, CA">San Francisco, CA</option>
+              <option value="Seattle, WA">Seattle, WA</option>
+              <option value="Boston, MA">Boston, MA</option>
+              <option value="Atlanta, GA">Atlanta, GA</option>
+              <option value="Miami, FL">Miami, FL</option>
+              <option value="Orlando, FL">Orlando, FL</option>
+              <option value="Tampa, FL">Tampa, FL</option>
+              <option value="Denver, CO">Denver, CO</option>
+              <option value="Austin, TX">Austin, TX</option>
               <option value="Remote">Remote</option>
             </select>
           </div>

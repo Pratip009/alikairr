@@ -18,7 +18,8 @@ const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [direction, setDirection] = useState(0);
-  const [imagesLoaded, setImagesLoaded] = useState({});
+  const [allImagesLoaded, setAllImagesLoaded] = useState(false);
+  const [nextSlide, setNextSlide] = useState(null);
 
   const titleRef = useRef(null);
   const locationRef = useRef(null);
@@ -56,15 +57,32 @@ const Hero = () => {
     },
   ];
 
-  // Preload images for smooth transitions
+  // Preload ALL images before showing carousel
   useEffect(() => {
-    slides.forEach((slide, index) => {
-      const img = new Image();
-      img.src = slide.src;
-      img.onload = () => {
-        setImagesLoaded(prev => ({ ...prev, [index]: true }));
-      };
+    let loadedCount = 0;
+    const totalImages = slides.length;
+
+    const preloadPromises = slides.map((slide) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = slide.src;
+        img.onload = () => {
+          loadedCount++;
+          resolve();
+        };
+        img.onerror = reject;
+      });
     });
+
+    Promise.all(preloadPromises)
+      .then(() => {
+        setAllImagesLoaded(true);
+      })
+      .catch((err) => {
+        console.error("Error preloading images:", err);
+        // Still show content even if some images fail
+        setAllImagesLoaded(true);
+      });
   }, []);
 
   const searchHandler = (e) => {
@@ -84,7 +102,7 @@ const Hero = () => {
 
   // Auto-play carousel
   useEffect(() => {
-    if (!isPlaying) return;
+    if (!isPlaying || !allImagesLoaded) return;
 
     const interval = setInterval(() => {
       setDirection(1);
@@ -92,14 +110,14 @@ const Hero = () => {
     }, 6000);
 
     return () => clearInterval(interval);
-  }, [isPlaying, slides.length]);
+  }, [isPlaying, slides.length, allImagesLoaded]);
 
-  const nextSlide = () => {
+  const handleNextSlide = () => {
     setDirection(1);
     setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
 
-  const prevSlide = () => {
+  const handlePrevSlide = () => {
     setDirection(-1);
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
@@ -109,23 +127,40 @@ const Hero = () => {
     setCurrentSlide(index);
   };
 
+  // Smoother slide variants with crossfade
   const slideVariants = {
     enter: (direction) => ({
-      x: direction > 0 ? 1000 : -1000,
       opacity: 0,
-      scale: 0.95,
+      scale: 1.05,
     }),
     center: {
-      x: 0,
       opacity: 1,
       scale: 1,
     },
     exit: (direction) => ({
-      x: direction < 0 ? 1000 : -1000,
       opacity: 0,
       scale: 0.95,
     }),
   };
+
+  // Show loading state while images preload
+  if (!allImagesLoaded) {
+    return (
+      <section
+        className="relative w-full h-[700px] md:h-[750px] lg:h-[800px] overflow-hidden"
+        id="hero"
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-gray-800 to-slate-900">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center">
+              <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-white text-lg font-semibold">Loading...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <>
@@ -150,20 +185,32 @@ const Hero = () => {
           }
 
           /* Optimize image rendering */
-          img {
+          .hero-image {
             image-rendering: -webkit-optimize-contrast;
             image-rendering: crisp-edges;
+            will-change: opacity, transform;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+          }
+
+          /* Prevent layout shift during transitions */
+          .hero-container {
+            position: relative;
+            contain: layout style paint;
           }
         `}
       </style>
 
       <section
-        className="relative w-full h-[700px] md:h-[750px] lg:h-[800px] overflow-hidden bg-gradient-to-br from-blue-900 via-gray-800 to-slate-900"
+        className="hero-container relative w-full h-[700px] md:h-[750px] lg:h-[800px] overflow-hidden bg-gradient-to-br from-blue-900 via-gray-800 to-slate-900"
         id="hero"
       >
+        {/* Static Background - Always visible as base layer */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-gray-800 to-slate-900" />
+
         {/* Carousel Container */}
         <div className="relative w-full h-full">
-          <AnimatePresence initial={false} custom={direction} mode="wait">
+          <AnimatePresence initial={false} custom={direction}>
             <motion.div
               key={currentSlide}
               custom={direction}
@@ -172,29 +219,27 @@ const Hero = () => {
               animate="center"
               exit="exit"
               transition={{
-                x: { type: "spring", stiffness: 300, damping: 30 },
-                opacity: { duration: 0.3 },
-                scale: { duration: 0.4 },
+                opacity: { duration: 0.7, ease: "easeInOut" },
+                scale: { duration: 0.7, ease: "easeOut" },
               }}
               className="absolute inset-0"
             >
-              {/* Image Background with Loading State */}
-              <div className="relative w-full h-full">
-                {!imagesLoaded[currentSlide] && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-gray-800 to-slate-900 animate-pulse" />
-                )}
+              {/* Image Background - Preloaded */}
+              <div className="absolute inset-0">
                 <img
                   src={slides[currentSlide].src}
                   alt={slides[currentSlide].title}
-                  className="absolute inset-0 w-full h-full object-cover"
+                  className="hero-image absolute inset-0 w-full h-full object-cover"
                   loading="eager"
-                  decoding="async"
-                  style={{ opacity: imagesLoaded[currentSlide] ? 1 : 0 }}
+                  decoding="sync"
                 />
 
+                {/* Dark Overlay for Text Readability */}
+                <div className="absolute inset-0 bg-black/40" />
+                
                 {/* Refined Gradient Overlays */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-900/40 via-transparent to-slate-900/40" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/70 to-slate-900/30" />
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-900/50 via-transparent to-slate-900/50" />
               </div>
 
               {/* Content */}
@@ -204,7 +249,7 @@ const Hero = () => {
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1, duration: 0.5 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
                     className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 mb-4 sm:mb-5 md:mb-6 bg-blue-500/20 backdrop-blur-md rounded-full border border-blue-300/30"
                   >
                     <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-blue-300" />
@@ -213,11 +258,11 @@ const Hero = () => {
                     </span>
                   </motion.div>
 
-                  {/* Main Title - Reduced Size */}
+                  {/* Main Title */}
                   <motion.h1
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2, duration: 0.6 }}
+                    transition={{ delay: 0.3, duration: 0.6 }}
                     className="hero-title text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white mb-3 sm:mb-4 md:mb-5 px-2"
                     style={{
                       textShadow: "0 4px 20px rgba(0,0,0,0.5)",
@@ -230,7 +275,7 @@ const Hero = () => {
                   <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3, duration: 0.5 }}
+                    transition={{ delay: 0.4, duration: 0.5 }}
                     className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-200 mb-4 sm:mb-5 md:mb-6 max-w-2xl mx-auto font-medium hero-font px-4"
                     style={{
                       textShadow: "0 2px 10px rgba(0,0,0,0.5)",
@@ -243,7 +288,7 @@ const Hero = () => {
                   <motion.div
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4, duration: 0.5 }}
+                    transition={{ delay: 0.5, duration: 0.5 }}
                     className="hidden sm:flex flex-wrap items-center justify-center gap-2 md:gap-3 mb-5 md:mb-7"
                   >
                     {slides[currentSlide].tags.map((tag, idx) => (
@@ -260,7 +305,7 @@ const Hero = () => {
                   <motion.form
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5, duration: 0.6 }}
+                    transition={{ delay: 0.6, duration: 0.6 }}
                     onSubmit={searchHandler}
                     className="bg-white backdrop-blur-xl rounded-xl md:rounded-2xl shadow-2xl p-3 sm:p-4 md:p-5 flex flex-col sm:flex-row gap-3 md:gap-4 items-stretch sm:items-center w-full max-w-4xl mx-auto border border-gray-200"
                   >
@@ -314,7 +359,7 @@ const Hero = () => {
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 0.7, duration: 0.5 }}
+                    transition={{ delay: 0.8, duration: 0.5 }}
                     className="flex mt-6 sm:mt-8 lg:mt-10 flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-10"
                   >
                     <div className="text-center">
@@ -353,7 +398,7 @@ const Hero = () => {
         {/* Navigation Arrows */}
         <div className="hidden lg:flex absolute inset-y-0 left-0 right-0 items-center justify-between px-6 lg:px-10 pointer-events-none z-30">
           <button
-            onClick={prevSlide}
+            onClick={handlePrevSlide}
             className="group pointer-events-auto w-12 h-12 lg:w-14 lg:h-14 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center transition-all duration-300 border border-white/30 hover:border-white/50 hover:scale-110"
             aria-label="Previous slide"
           >
@@ -363,7 +408,7 @@ const Hero = () => {
             />
           </button>
           <button
-            onClick={nextSlide}
+            onClick={handleNextSlide}
             className="group pointer-events-auto w-12 h-12 lg:w-14 lg:h-14 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center transition-all duration-300 border border-white/30 hover:border-white/50 hover:scale-110"
             aria-label="Next slide"
           >
@@ -408,12 +453,13 @@ const Hero = () => {
         {/* Slide Counter */}
         <div className="hidden sm:block absolute bottom-4 sm:bottom-6 md:bottom-8 left-4 sm:left-6 md:left-8 z-30 bg-black/20 backdrop-blur-md px-3 sm:px-4 py-2 sm:py-2.5 rounded-full border border-white/20">
           <span className="text-white text-xs sm:text-sm font-bold hero-font">
-            {String(currentSlide + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}
+            {String(currentSlide + 1).padStart(2, "0")} /{" "}
+            {String(slides.length).padStart(2, "0")}
           </span>
         </div>
 
         {/* Subtle Background Effects */}
-        <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden opacity-30">
+        <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden opacity-30 z-0">
           <div className="absolute -top-40 -left-40 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl" />
           <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-cyan-500/20 rounded-full blur-3xl" />
         </div>

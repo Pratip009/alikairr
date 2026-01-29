@@ -34,7 +34,7 @@ const Home = () => {
       
       <Testimonials />
       <EngageWithUs/>
-      <FloatingSocials />
+      
     </>
   );
 };

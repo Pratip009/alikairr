@@ -160,7 +160,7 @@ const ApplyJob = () => {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-8 px-5 md:px-15">
           <div className="w-full lg:w-1/2 xl:w-2/3">
             <h1 className="text-2xl font-bold mb-6 text-gray-700">
               Job Description
