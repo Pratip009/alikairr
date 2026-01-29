@@ -32,89 +32,134 @@ const CinematicLoader = ({ onLoadComplete }) => {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] bg-black flex items-center justify-center transition-opacity duration-800 ${
+      className={`fixed inset-0 z-[9999] bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/40 flex items-center justify-center transition-opacity duration-800 ${
         isExiting ? 'opacity-0' : 'opacity-100'
       }`}
     >
-      {/* Animated background */}
+      {/* Elegant background elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-blue-900/20 animate-pulse" />
+        {/* Soft gradient orbs */}
+        <div className="absolute top-0 -left-40 w-80 h-80 bg-gradient-to-br from-blue-200/40 to-indigo-200/40 rounded-full blur-3xl animate-pulse-slow" />
+        <div className="absolute bottom-0 -right-40 w-96 h-96 bg-gradient-to-br from-indigo-200/30 to-purple-200/30 rounded-full blur-3xl animate-pulse-slower" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-br from-blue-100/20 to-transparent rounded-full blur-3xl animate-rotate-slow" />
         
-        {/* Animated particles */}
-        {[...Array(20)].map((_, i) => (
+        {/* Floating medical icons/particles */}
+        {[...Array(15)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-1 h-1 bg-white rounded-full animate-float"
+            className="absolute animate-float-gentle opacity-20"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${3 + Math.random() * 4}s`,
-              opacity: 0.3 + Math.random() * 0.4
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${8 + Math.random() * 4}s`,
             }}
-          />
+          >
+            {i % 3 === 0 ? (
+              // Medical cross
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-blue-400">
+                <path d="M12 2V22M2 12H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            ) : i % 3 === 1 ? (
+              // Heartbeat
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-indigo-400">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" strokeWidth="2"/>
+              </svg>
+            ) : (
+              // Circle
+              <div className="w-2 h-2 rounded-full bg-gradient-to-br from-blue-400 to-indigo-400" />
+            )}
+          </div>
         ))}
       </div>
 
       {/* Main loader content */}
-      <div className="relative z-10 text-center px-6 max-w-2xl">
-        {/* Logo or title animation */}
-        <div className="mb-12 animate-fade-in">
-          <h1 className="text-6xl md:text-8xl font-bold text-white mb-4 tracking-wider">
-            <span className="inline-block animate-glow">ALIKAIR</span>
+      <div className="relative z-10 text-center px-6 max-w-3xl">
+        {/* Logo/Brand with premium typography */}
+        <div className="mb-16 animate-fade-in-up">
+          <h1 className="text-7xl md:text-8xl lg:text-9xl font-extralight text-transparent bg-clip-text bg-gradient-to-r from-gray-800 via-blue-900 to-indigo-900 mb-6 tracking-tight leading-none">
+            <span className="inline-block animate-shimmer bg-gradient-to-r from-gray-800 via-blue-600 to-gray-800 bg-[length:200%_100%] bg-clip-text">
+              ALIKAIR
+            </span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-300 animate-fade-in-delay">
-            Healthcare Staffing Solution
-          </p>
-        </div>
-
-        {/* Progress bar */}
-        <div className="w-full max-w-md mx-auto">
-          <div className="h-1 bg-gray-800 rounded-full overflow-hidden mb-4">
-            <div
-              className="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 transition-all duration-300 ease-out"
-              style={{ width: `${progress}%` }}
-            />
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <div className="h-px w-12 bg-gradient-to-r from-transparent to-blue-400"></div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-blue-500">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" strokeWidth="2"/>
+            </svg>
+            <div className="h-px w-12 bg-gradient-to-l from-transparent to-blue-400"></div>
           </div>
-          <p className="text-gray-400 text-sm font-mono">
-            {Math.round(progress)}%
+          <p className="text-xl md:text-2xl text-gray-600 font-light tracking-[0.3em] uppercase animate-fade-in-delay">
+            Healthcare Staffing Excellence
           </p>
         </div>
 
-        {/* Loading text animation */}
-        <div className="mt-8 text-gray-500 text-sm tracking-widest animate-pulse">
-          LOADING
-          <span className="inline-block animate-dots">...</span>
+        {/* Premium progress bar */}
+        <div className="w-full max-w-md mx-auto animate-fade-in-delay-2">
+          <div className="relative h-1.5 bg-gray-200/50 rounded-full overflow-hidden backdrop-blur-sm mb-4">
+            {/* Background shine effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shine"></div>
+            {/* Progress bar */}
+            <div
+              className="absolute inset-y-0 left-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600 transition-all duration-300 ease-out rounded-full shadow-lg shadow-blue-500/50"
+              style={{ width: `${progress}%` }}
+            >
+              {/* Glowing effect on progress bar */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-slide"></div>
+            </div>
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <p className="text-gray-500 font-light tracking-wider">
+              Loading Experience
+            </p>
+            <p className="text-gray-700 font-medium tabular-nums">
+              {Math.round(progress)}%
+            </p>
+          </div>
+        </div>
+
+        {/* Elegant loading text */}
+        <div className="mt-12 animate-fade-in-delay-3">
+          <p className="text-gray-400 text-sm font-light tracking-[0.2em] uppercase">
+            Preparing Your Journey
+            <span className="inline-block animate-pulse-dots ml-1">...</span>
+          </p>
         </div>
       </div>
 
-      {/* Film grain effect */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-overlay">
-        <div className="w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGQ9Ik0wIDBoMzAwdjMwMEgweiIgZmlsdGVyPSJ1cmwoI2EpIiBvcGFjaXR5PSIuMDUiLz48L3N2Zz4=')] animate-grain" />
+      {/* Subtle overlay pattern */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.02]">
+        <div className="w-full h-full" style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, rgb(59 130 246 / 0.15) 1px, transparent 0)`,
+          backgroundSize: '40px 40px'
+        }}></div>
       </div>
 
       <style jsx>{`
-        @keyframes float {
+        @keyframes float-gentle {
           0%, 100% {
-            transform: translateY(0) translateX(0);
+            transform: translateY(0) translateX(0) rotate(0deg);
             opacity: 0;
           }
           10% {
-            opacity: 1;
+            opacity: 0.15;
+          }
+          50% {
+            opacity: 0.2;
           }
           90% {
-            opacity: 1;
+            opacity: 0.15;
           }
           100% {
-            transform: translateY(-100vh) translateX(${Math.random() > 0.5 ? '' : '-'}20px);
+            transform: translateY(-120vh) translateX(30px) rotate(180deg);
             opacity: 0;
           }
         }
 
-        @keyframes fade-in {
+        @keyframes fade-in-up {
           from {
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(30px);
           }
           to {
             opacity: 1;
@@ -127,7 +172,7 @@ const CinematicLoader = ({ onLoadComplete }) => {
             opacity: 0;
             transform: translateY(20px);
           }
-          50% {
+          40% {
             opacity: 0;
             transform: translateY(20px);
           }
@@ -137,65 +182,149 @@ const CinematicLoader = ({ onLoadComplete }) => {
           }
         }
 
-        @keyframes glow {
+        @keyframes fade-in-delay-2 {
+          0% {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          60% {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes fade-in-delay-3 {
+          0% {
+            opacity: 0;
+          }
+          70% {
+            opacity: 0;
+          }
+          100% {
+            opacity: 1;
+          }
+        }
+
+        @keyframes shimmer {
+          0% {
+            background-position: -200% 0;
+          }
+          100% {
+            background-position: 200% 0;
+          }
+        }
+
+        @keyframes shine {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+
+        @keyframes slide {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+
+        @keyframes pulse-slow {
           0%, 100% {
-            text-shadow: 0 0 20px rgba(168, 85, 247, 0.5),
-                         0 0 40px rgba(168, 85, 247, 0.3);
+            opacity: 0.3;
+            transform: scale(1);
           }
           50% {
-            text-shadow: 0 0 30px rgba(168, 85, 247, 0.8),
-                         0 0 60px rgba(168, 85, 247, 0.5),
-                         0 0 80px rgba(168, 85, 247, 0.3);
+            opacity: 0.5;
+            transform: scale(1.05);
           }
         }
 
-        @keyframes dots {
+        @keyframes pulse-slower {
+          0%, 100% {
+            opacity: 0.2;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.4;
+            transform: scale(1.08);
+          }
+        }
+
+        @keyframes rotate-slow {
+          0% {
+            transform: translate(-50%, -50%) rotate(0deg);
+          }
+          100% {
+            transform: translate(-50%, -50%) rotate(360deg);
+          }
+        }
+
+        @keyframes pulse-dots {
           0%, 20% {
-            content: '.';
+            opacity: 0.3;
           }
           40% {
-            content: '..';
+            opacity: 0.6;
           }
           60%, 100% {
-            content: '...';
+            opacity: 1;
           }
         }
 
-        @keyframes grain {
-          0%, 100% { transform: translate(0, 0); }
-          10% { transform: translate(-5%, -10%); }
-          20% { transform: translate(-15%, 5%); }
-          30% { transform: translate(7%, -25%); }
-          40% { transform: translate(-5%, 25%); }
-          50% { transform: translate(-15%, 10%); }
-          60% { transform: translate(15%, 0%); }
-          70% { transform: translate(0%, 15%); }
-          80% { transform: translate(3%, 35%); }
-          90% { transform: translate(-10%, 10%); }
+        .animate-float-gentle {
+          animation: float-gentle linear infinite;
         }
 
-        .animate-float {
-          animation: float linear infinite;
-        }
-
-        .animate-fade-in {
-          animation: fade-in 1s ease-out;
+        .animate-fade-in-up {
+          animation: fade-in-up 1s ease-out;
         }
 
         .animate-fade-in-delay {
           animation: fade-in-delay 2s ease-out;
         }
 
-        .animate-glow {
-          animation: glow 2s ease-in-out infinite;
+        .animate-fade-in-delay-2 {
+          animation: fade-in-delay-2 2s ease-out;
         }
 
-        .animate-dots {
-          animation: dots 1.5s steps(3, end) infinite;
+        .animate-fade-in-delay-3 {
+          animation: fade-in-delay-3 2.5s ease-out;
         }
 
-        .animate-grain {
-          animation: grain 8s steps(10) infinite;
+        .animate-shimmer {
+          animation: shimmer 3s ease-in-out infinite;
+        }
+
+        .animate-shine {
+          animation: shine 2s ease-in-out infinite;
+        }
+
+        .animate-slide {
+          animation: slide 1.5s ease-in-out infinite;
+        }
+
+        .animate-pulse-slow {
+          animation: pulse-slow 4s ease-in-out infinite;
+        }
+
+        .animate-pulse-slower {
+          animation: pulse-slower 6s ease-in-out infinite;
+        }
+
+        .animate-rotate-slow {
+          animation: rotate-slow 20s linear infinite;
+        }
+
+        .animate-pulse-dots {
+          animation: pulse-dots 1.5s ease-in-out infinite;
         }
       `}</style>
     </div>
